@@ -40,10 +40,6 @@ This method clears the driver’s graphics buffer. It does not update the screen
 display.clear().text("Hello, World!").draw()
 ```
 
-### set_inverse(*is_inverse*) ###
-
-This method is called to set the display to black-on-white (`True`) or white-on-black (`False`). It defaults to `True`.
-
 ### draw() ###
 
 This method is used to write the contents of the driver’s buffer to the display itself.
@@ -54,6 +50,10 @@ This method is used to write the contents of the driver’s buffer to the displa
 # Draw a diagonal line
 display.line(0,0,127,31).draw()
 ```
+
+### set_inverse(*is_inverse*) ###
+
+This method is called to set the display to black-on-white (`True`) or white-on-black (`False`). It defaults to `True`.
 
 ### move(*x, y*) ###
 
@@ -106,15 +106,11 @@ This method draws a circle centred on the co-ordinates (x,y) and with the specif
 display.circle(47, 16, 14, 0, True).circle(81, 16, 14, 0, True).draw();
 ```
 
-### update() ###
-
-Call *update()* after changing any or all of the internal display buffer contents in order to reflect those changes on the display itself.
-
 ## Release Notes ##
 
-- 1.0.0 *4 march 2020*
+- 1.0.0 *5 march 2020*
     - Initial public release
 
 ## License ##
 
-The HTK16K33Segment libraries are licensed under the [MIT License](LICENSE).
+The SSD1306OLED library is licensed under the [MIT License](LICENSE).
