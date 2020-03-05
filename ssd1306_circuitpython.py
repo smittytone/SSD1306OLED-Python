@@ -45,10 +45,6 @@ class SSD1306OLED:
     SSD1306_VERTICAL_AND_LEFT_HORIZONTAL_SCROLL = 0x2A
     SSD1306_WRITETOBUFFER = 0x40
 
-    HIGH = 1
-    LOW = 0
-    ALPHA_COUNT = 96
-
     CHARSET = [
         [0x00, 0x00],					# space - Ascii 32
         [0xfa],							# !
