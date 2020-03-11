@@ -1,10 +1,19 @@
 # SSD1306OLED 1.0.0 #
 
-A hardware driver for the [Adafruit 128x32 OLED](https://www.adafruit.com/product/931), which is based on the Solomon SSD1306 controller. The OLED communicates over any I&sup2;C bus.
+A hardware driver for the [Adafruit 128x32 OLED](https://www.adafruit.com/product/931) and [Adafruit 128x64 OLED](https://www.adafruit.com/product/326) panels, which are based on the Solomon SSD1306 controller. The OLEDs communicate over any I&sup2;C bus.
 
-## Character Set ##
+### Character Set ###
 
 The driver contains a full, proportionally spaced Ascii character set.
+
+### I2C Addressing ###
+
+The displays have the following default I2C addresses:
+
+- 128x32 — `0x3C`
+- 128x64 — `0x3D`
+
+The first of these is the constructor default, so you will need to pass in the second value if you are using the larger panel. You will need to pass in an alternative address if you have changed it at the board level.
 
 ## Class Usage ##
 
@@ -25,7 +34,7 @@ reset = digitalio.DigitalInOut(board.D7)
 reset.direction = digitalio.Direction.OUTPUT
 
 # Set up OLED display as the default address
-display = SSD1306OLED(reset, i2c, 0x3C)
+display = SSD1306OLED(reset, i2c)
 ```
 
 ## Class Methods ##
@@ -108,7 +117,7 @@ display.circle(47, 16, 14, 0, True).circle(81, 16, 14, 0, True).draw();
 
 ## Release Notes ##
 
-- 1.0.0 *5 march 2020*
+- 1.0.0 *11 march 2020*
     - Initial public release
 
 ## License ##
