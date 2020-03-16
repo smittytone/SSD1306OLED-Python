@@ -357,7 +357,7 @@ class SSD1306OLED:
             a = x - int(radius * self.SIN_TABLE[i])
             b = y - int(radius * self.COS_TABLE[i])
 
-            if a >= 0 and a < self.width and b >= 0 and b < self.height:
+            if 0 <= a < self.width and 0 <= b < self.height:
                 self.plot(a, b, color)
 
                 if fill is True:
