@@ -1,4 +1,4 @@
-# SSD1306OLED 1.0.0 #
+# SSD1306OLED Python 1.0.0 #
 
 A hardware driver for the [Adafruit 128x32 OLED](https://www.adafruit.com/product/931) and [Adafruit 128x64 OLED](https://www.adafruit.com/product/326) panels, which are based on the Solomon SSD1306 controller. The OLEDs communicate over any I&sup2;C bus.
 
@@ -106,13 +106,13 @@ display.line(0,0,127,31).line(127,0,0,31).draw()
 
 This method draws a circle centred on the co-ordinates (x,y) and with the specified radius. If no ink colour is specified, the method defaults to the current foreground colour. You can also opt to pass `True` into the *fill* parameter to create a solid circle; otherwise an outline will be drawn.
 
-*circle()* does not update the display, only the buffer. Call *update()* to refresh the LED.
+*circle()* does not update the screen — call [*draw()*](#draw) to do so.
 
 #### Example ####
 
 ```python
 # Draw two filled circles side by side
-display.circle(47, 16, 14, 0, True).circle(81, 16, 14, 0, True).draw();
+display.circle(47, 16, 14, 1, True).circle(81, 16, 14, 1, True).draw();
 ```
 
 ## Release Notes ##
