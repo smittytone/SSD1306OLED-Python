@@ -320,26 +320,41 @@ class SSD1306OLED:
         # Make sure we have a thickness of at least one pixel
         if thick < 1: thick = 1;
 
-        # If necessary swap x and tox so we always scan L-R
-        if x > tox:
-            a = x;
-            x = tox;
-            tox = a
+        # Look for vertical and horizontal lines
+        track_by_x = True
+        if x == tox: track_by_x = False
+        if y == toy and track_by_x == False: return None
 
-        # Calculate the line gradient
-        if tox - x != 0:
+        # Swap start and end values for L-R raster
+        if track_by_x:
+            if x > tox:
+                a = x;
+                x = tox;
+                tox = a
+            start = x
+            end = tox
             m = float(toy - y) / float(tox - x)
         else:
-            m = 0
-        dy = 0
+            if y > toy:
+                a = y;
+                y = toy;
+                toy = a
+            start = y
+            end = toy
+            m = float(tox - x) / float(toy - y)
 
         # Run for 'thick' times to generate thickness
         for j in range(0, thick):
             # Run from x to tox, calculating the y offset at each point
-            for i in range(x, tox):
-                dy = y + int(m * (i - x)) + j;
-                if i >= 0 and i < self.width and dy >= 0 and dy < self.height:
-                    self.plot(i, dy, color)
+            for i in range(start, end):
+                if track_by_x:
+                    dy = y + int(m * (i - x)) + j;
+                    if (0 <= i < self.width) and (0 <= dy < self.height):
+                        self.plot(i, dy, color)
+                else:
+                    dx = x + int(m * (i - y)) + j;
+                    if (0 <= i < self.height) and (0 <= dx < self.width):
+                        self.plot(dx, i, color)
         return self
 
     def circle(self, x, y, radius, color=1, fill=False):
@@ -363,7 +378,7 @@ class SSD1306OLED:
             if 0 <= a < self.width and 0 <= b < self.height:
                 self.plot(a, b, color)
 
-                if fill is True:
+                if fill:
                     if a > x:
                         j = x
                         while True:
@@ -415,117 +430,20 @@ class SSD1306OLED:
         Returns:
             The display object
         """
-        # Bail if any co-ordinates are off the screen
-        # TODO better error reporting
-        if print_string is None or len(print_string) == 0: return self
+        return self._draw_text(print_string, False)
 
-        x = self.x
-        y = self.y
 
-        for i in range(0, len(print_string)):
-            asc = ord(print_string[i]) - 32
-            glyph = self.CHARSET[asc]
+    def text_2x(self, print_string=None):
+        """
+        Write a line of double-size text at the current cursor co-ordinates
 
-            for j in range(0, len(glyph) + 1):
-                # j adds to x
-                if j == len(glyph) and x < 128:
-                    c = 0x00
-                else:
-                    c = self._flip(glyph[j])
+        Args:
+            print_string (string) The text to print
 
-                z = y if y < 8 else y - ((y >> 3) << 3)
-                z -= 1
-
-                for k in range(0, 8):
-                    # k adds to y
-                    # z is the bit value in y; deals with y + k extending
-                    # beyond byte boundary
-                    if ((y + k) % 8) == 0 and k != 0:
-                        z = 0
-                    else:
-                        z += 1
-
-                    b = self._coords_to_index(x, y + k)
-                    v = self.buffer[b]
-                    if c & (1 << k) != 0: v = v | (1 << z)
-                    self.buffer[b] = v
-
-                # Move on one pixel
-                x += 1
-                if x > self.width - 1:
-                    # Right side hit, so move to next text line
-                    if y + 8 < self.height:
-                        x = 0
-                        y += 8
-                    else:
-                        break
-        return self
-
-    def text_2x(self, double_string):
-
-        x = self.x
-        y = self.y
-
-        for i in range(0, len(double_string)):
-            asc = ord(double_string[i]) - 32
-            glyph = self.CHARSET[asc]
-
-            col0 = self._flip(glyph[0])
-            for j in range(1, len(glyph)):
-                # j adds to x
-                col1 = self._flip(glyph[j])
-
-                # if double
-                c1r = self._stretch(col1)
-                c1l = c1r
-                c0r = self._stretch(col0)
-                c0l = c0r
-
-                # If Smooth
-                for a in range(6, -1, -1):
-                    for b in range(1, 3):
-                        if (col0 >> a & 0x03 == 3 - b) and (col1 >> a & 0x03 == b):
-                            c0r |= (1 << ((a * 2) + b));
-                            c1l |= (1 << ((a * 2) + 3 - b))
-
-                z = y if y < 8 else y - ((y >> 3) << 3)
-                z -= 1
-
-                for k in range(0, 16):
-                    # k adds to y
-                    # z is the bit value in y; deals with y + k extending
-                    # beyond byte boundary
-                    if ((y + k) % 8) == 0 and k > 0:
-                        z = 0
-                    else:
-                        z += 1
-
-                    self._char_plot(x, y, k, c0l, z)
-                    self._char_plot(x + 1, y, k, c0r, z)
-                    self._char_plot(x + 2, y, k, c1l, z)
-                    self._char_plot(x + 3, y, k, c1r, z)
-
-                # Move on two pixels
-                x += 2
-                if x > self.width - 1:
-                    # Right side hit, so move to next text line
-                    if y + 8 < self.height:
-                        x = 0
-                        y += 8
-                    else:
-                        break
-                col0 = col1
-
-            if i < len(double_string) - 1:
-                x += 4
-                if x > self.width - 1:
-                    # Right side hit, so move to next text line
-                    if y + 8 < self.height:
-                        x = 0
-                        y += 8
-                    else:
-                        break
-        return self
+        Returns:
+            The display object
+        """
+        return self._draw_text(print_string, True)
 
     def length_of_string(self, print_string):
         """
@@ -560,18 +478,12 @@ class SSD1306OLED:
         """
         Convert pixel co-ordinates to a bytearray index
         Calling function should check for valid co-ordinates first
-
-        Returns:
-            An index value (integer)
         """
         return ((y >> 3) * self.width) + x
 
     def _indexToCoords(self, idx):
         """
         Convert bytearray index to pixel co-ordinates
-
-        Returns:
-            X and Y co-ordinates in a tuple
         """
         y = idx >> 4
         x = idx - (y << 4)
@@ -581,9 +493,6 @@ class SSD1306OLED:
         """
         Rotates the character array from the saved state
         to that required by the screen orientation
-
-        Returns:
-            Flipped value as integer
         """
         flipped = 0
         for i in range (0, 8):
@@ -591,14 +500,87 @@ class SSD1306OLED:
                 flipped += (1 << (7 - i))
         return flipped
 
+    def _draw_text(self, the_string, do_double):
+        """
+        Generic text rendering routine
+        """
+        if the_string is None or len(the_string) == 0: return None
+
+        x = self.x
+        y = self.y
+        bit_max = 16 if do_double else 8
+
+        for i in range(0, len(the_string)):
+            glyph = self.CHARSET[ord(the_string[i]) - 32]
+
+            if x + len(glyph) > self.width - 1:
+                if y + 8 < self.height:
+                    x = 0
+                    y += 8
+                else:
+                    return self
+
+            col_0 = self._flip(glyph[0])
+            for j in range(1, len(glyph)):
+                col_1 = self._flip(glyph[j])
+
+                if do_double:
+                    col_0_right = self._stretch(col_0)
+                    col_0_left = col_0_right
+                    col_1_right = self._stretch(col_1)
+                    col_1_left = col_1_right
+
+                    for a in range(6, -1, -1):
+                        for b in range(1, 3):
+                            if (col_0 >> a & 3 == 3 - b) and (col_1 >> a & 3 == b):
+                                col_0_right |= (1 << ((a * 2) + b));
+                                col_1_left |= (1 << ((a * 2) + 3 - b))
+
+                z = (y - ((y >> 3) << 3)) - 1
+
+                for k in range(0, bit_max):
+                    if ((y + k) % 8) == 0 and k > 0:
+                        z = 0
+                    else:
+                        z += 1
+
+                    if do_double:
+                        self._char_plot(    x, y, k, col_0_left, z)
+                        self._char_plot(x + 1, y, k, col_0_right, z)
+                        self._char_plot(x + 2, y, k, col_1_left, z)
+                        self._char_plot(x + 3, y, k, col_1_right, z)
+                        x += 2
+                    else:
+                        self._char_plot(x, y, k, col_0, z)
+                        x += 1
+
+                col_0 = col_1
+
+            # Add spacer if we can
+            if i < len(double_string) - 1:
+                x += 4 if do_double else 2
+                if x > self.width - 1:
+                    # Right side hit, so move to next text line
+                    if y + 8 < self.height:
+                        x = 0
+                        y += 8
+                    else:
+                        break
+        return self
+
     def _char_plot(self, x, y, k, c, a):
+        """
+        Write a pixel from a character glyph to the buffer
+        """
         b = self._coords_to_index(x, y + k)
         v = self.buffer[b]
         if c & (1 << k) != 0: v = v | (1 << a)
         self.buffer[b] = v
 
-
     def _stretch(self, x):
+        """
+        Pixel-doubles an 8-bit value to 16 bits
+        """
         x = (x & 0xF0) << 4 | (x & 0x0F);
         x = (x << 2 | x) & 0x3333;
         x = (x << 1 | x) & 0x5555;

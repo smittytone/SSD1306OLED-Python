@@ -23,17 +23,30 @@ To instantiate an SSD1306OLED object pass the reset pin and I&sup2;C bus to whic
 
 The passed reset pin and I&sup2;C bus must be configured before the SSD1306OLED object is created.
 
-#### Example ####
+#### CircuitPython Example ####
 
 ```python
-# Set up I2C on the FT232H Breakout
+# Set up I2C
 i2c = busio.I2C(board.SCL, board.SDA)
 
 # Set up the RST pin
 reset = digitalio.DigitalInOut(board.D7)
 reset.direction = digitalio.Direction.OUTPUT
 
-# Set up OLED display as the default address
+# Set up OLED display at the default address
+display = SSD1306OLED(reset, i2c)
+```
+
+#### CircuitPython Example ####
+
+```python
+# Set up I2C
+i2c = I2C(scl=Pin(5), sda=Pin(4))
+
+# Set up the RST pin
+reset = Pin(2, Pin.out)
+
+# Set up OLED display at the default address
 display = SSD1306OLED(reset, i2c)
 ```
 
@@ -70,7 +83,7 @@ This method moves the text cursor to the specified co-ordinates.
 
 ### home() ###
 
-This method moves the text cursor to the home position: the top left of the screen (co-ordinates (0,0).
+This method moves the text cursor to the home position: the top left of the screen (co-ordinates 0,0).
 
 ### plot(*x, y[, colour]*) ###
 
@@ -115,9 +128,39 @@ This method draws a circle centred on the co-ordinates (x,y) and with the specif
 display.circle(47, 16, 14, 1, True).circle(81, 16, 14, 1, True).draw();
 ```
 
+### text(*the_text*) ###
+
+Render the specified text into the buffer at the current co-ordinates.
+
+*text()* does not update the screen — call [*draw()*](#draw) to do so.
+
+#### Example ####
+
+```python
+for i in range (0, 56):
+    display.clear().move(0, i).text("Line " + str(i) + " 16px").draw()
+```
+
+### text_2x(*the_text*) ###
+
+Render the specified text at double-size into the buffer at the current co-ordinates.
+
+*text()* does not update the screen — call [*draw()*](#draw) to do so.
+
+#### Example ####
+
+```python
+for i in range (0, 49):
+    display.clear().move(0, i).text_2x("Line " + str(i) + " 16px").draw()
+```
+
+### length_of_string(*the_string*) ###
+
+Returns the length of the string in pixels.
+
 ## Release Notes ##
 
-- 1.0.0 *11 march 2020*
+- 1.0.0 *Unreleased*
     - Initial public release
 
 ## License ##
