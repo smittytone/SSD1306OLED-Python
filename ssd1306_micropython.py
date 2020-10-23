@@ -265,7 +265,7 @@ class SSD1306OLED:
         Returns:
             The display object
         """
-        if x < 0 or x > (self.width - 1) or y < 0 or y > (self.height - 1): return
+        if x < 0 or x >= self.width or y < 0 or y >= self.height: return None
         self.x = x
         self.y = y
         return self
@@ -283,8 +283,7 @@ class SSD1306OLED:
             The display object
         """
         # Bail if any co-ordinates are off the screen
-        # TODO better error reporting
-        if x < 0 or x > (self.width - 1) or y < 0 or y > (self.height - 1): return
+        if x < 0 or x >= self.width or y < 0 or y >= self.height: return None
 
         # Get the buffer byte holding the pixel
         byte = self._coords_to_index(x, y)
@@ -420,7 +419,7 @@ class SSD1306OLED:
                     self.plot(j, i, 0)
         return self
 
-    def text(self, print_string=None):
+    def text(self, print_string=None, do_wrap=True):
         """
         Write a line of text at the current cursor co-ordinates
 
@@ -430,10 +429,10 @@ class SSD1306OLED:
         Returns:
             The display object
         """
-        return self._draw_text(print_string, False)
+        return self._draw_text(print_string, do_wrap, False)
 
 
-    def text_2x(self, print_string=None):
+    def text_2x(self, print_string=None, do_wrap=True):
         """
         Write a line of double-size text at the current cursor co-ordinates
 
@@ -443,7 +442,7 @@ class SSD1306OLED:
         Returns:
             The display object
         """
-        return self._draw_text(print_string, True)
+        return self._draw_text(print_string, do_wrap, True)
 
     def length_of_string(self, print_string):
         """
@@ -500,7 +499,7 @@ class SSD1306OLED:
                 flipped += (1 << (7 - i))
         return flipped
 
-    def _draw_text(self, the_string, do_double):
+    def _draw_text(self, the_string, do_wrap, do_double):
         """
         Generic text rendering routine
         """
@@ -512,17 +511,22 @@ class SSD1306OLED:
 
         for i in range(0, len(the_string)):
             glyph = self.CHARSET[ord(the_string[i]) - 32]
-
-            if x + len(glyph) > self.width - 1:
-                if y + 8 < self.height:
-                    x = 0
-                    y += 8
-                else:
-                    return self
-
             col_0 = self._flip(glyph[0])
-            for j in range(1, len(glyph)):
-                col_1 = self._flip(glyph[j])
+
+            if do_wrap:
+                if x + len(glyph) * (2 if do_double else 1) >= self.width:
+                    if y + bit_max < self.height:
+                        x = 0
+                        y += bit_max
+                    else:
+                        return self
+
+            for j in range(1, len(glyph) + 1):
+                if j == len(glyph):
+                    if do_double: break
+                    col_1 = self._flip(glyph[j - 1])
+                else:
+                    col_1 = self._flip(glyph[j])
 
                 if do_double:
                     col_0_right = self._stretch(col_0)
@@ -545,25 +549,31 @@ class SSD1306OLED:
                         z += 1
 
                     if do_double:
-                        self._char_plot(    x, y, k, col_0_left, z)
-                        self._char_plot(x + 1, y, k, col_0_right, z)
-                        self._char_plot(x + 2, y, k, col_1_left, z)
-                        self._char_plot(x + 3, y, k, col_1_right, z)
-                        x += 2
+                        if x < self.width: self._char_plot(x, y, k, col_0_left, z)
+                        if x + 1 < self.width: self._char_plot(x + 1, y, k, col_0_right, z)
+                        if x + 2 < self.width: self._char_plot(x + 2, y, k, col_1_left, z)
+                        if x + 3 < self.width: self._char_plot(x + 3, y, k, col_1_right, z)
                     else:
-                        self._char_plot(x, y, k, col_0, z)
-                        x += 1
+                        if x < self.width: self._char_plot(x, y, k, col_0, z)
 
+                x += (2 if do_double else 1)
+                if x >= self.width:
+                    if not do_wrap: return self
+                    if y + bit_max < self.height:
+                        x = 0
+                        y += bit_max
+                    else:
+                        break
                 col_0 = col_1
 
             # Add spacer if we can
-            if i < len(double_string) - 1:
-                x += 4 if do_double else 2
-                if x > self.width - 1:
-                    # Right side hit, so move to next text line
-                    if y + 8 < self.height:
+            if i < len(the_string) - 1:
+                x += (3 if do_double else 1)
+                if x >= self.width:
+                    if not do_wrap: return self
+                    if y + bit_max < self.height:
                         x = 0
-                        y += 8
+                        y += bit_max
                     else:
                         break
         return self
