@@ -128,9 +128,9 @@ This method draws a circle centred on the co-ordinates (x,y) and with the specif
 display.circle(47, 16, 14, 1, True).circle(81, 16, 14, 1, True).draw();
 ```
 
-### text(*the_text*) ###
+### text(*the_text[, do_wrap]*) ###
 
-Render the specified text into the buffer at the current co-ordinates.
+Render the specified text into the buffer at the current co-ordinates. If *do_wrap* is True (the default), wrap text onto a new line if necessary and possible.
 
 *text()* does not update the screen — call [*draw()*](#draw) to do so.
 
@@ -141,9 +141,9 @@ for i in range (0, 56):
     display.clear().move(0, i).text("Line " + str(i) + " 16px").draw()
 ```
 
-### text_2x(*the_text*) ###
+### text_2x(*the_text[, do_wrap]*) ###
 
-Render the specified text at double-size into the buffer at the current co-ordinates.
+Render the specified text at double-size into the buffer at the current co-ordinates. If *do_wrap* is True (the default), wrap text onto a new line if necessary and possible.
 
 *text()* does not update the screen — call [*draw()*](#draw) to do so.
 

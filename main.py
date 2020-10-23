@@ -1,7 +1,29 @@
 # IMPORTS
-import time
+import utime as time
+from urandom import getrandbits
 from machine import I2C, Pin
 from ssd1306_micropython import SSD1306OLED
+
+
+# FUNCTIONS
+def randint(start, stop=None):
+    if stop is None:
+        stop = start
+        start = 0
+    upper = stop - start
+    bits = 0
+    pwr2 = 1
+    while upper > pwr2:
+        pwr2 <<= 1
+        bits += 1
+    while True:
+        r = getrandbits(bits)
+        if r < upper: break
+    return r + start
+
+def make_rect():
+    return (randint(-10, 137), randint(-10, 53), randint(10, 80), randint(10, 50))
+
 
 # START
 if __name__ == '__main__':
@@ -14,9 +36,4 @@ if __name__ == '__main__':
     # Set up the display
     display = SSD1306OLED(reset, i2c, 0x3D, 128, 64)
 
-    # Get initial values
-    #display.text("Standard line 1 8px").draw()
-    #display.move(0, 8).text("Standard line 2 8px").draw()
-    for i in range (0, 64 - 15):
-        display.clear().move(0, i).text_2x("Line " + str(i) + " 16px").draw()
-        time.sleep(0.05)
+    display.text_2x("supercallifragilisticexpiallidocious").draw()
