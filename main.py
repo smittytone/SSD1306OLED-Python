@@ -21,6 +21,7 @@ def randint(start, stop=None):
         if r < upper: break
     return r + start
 
+
 def make_rect():
     return (randint(-10, 137), randint(-10, 53), randint(10, 80), randint(10, 50))
 

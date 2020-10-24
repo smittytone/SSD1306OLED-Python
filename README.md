@@ -2,6 +2,8 @@
 
 A hardware driver for the [Adafruit 128x32 OLED](https://www.adafruit.com/product/931) and [Adafruit 128x64 OLED](https://www.adafruit.com/product/326) panels, which are based on the Solomon SSD1306 controller. The OLEDs communicate over any I&sup2;C bus.
 
+The driver is available in [MicroPython](http://micropython.org) and [CircuitPython](https://circuitpython.org) versions.
+
 ### Character Set ###
 
 The driver contains a full, proportionally spaced Ascii character set.
@@ -26,6 +28,8 @@ The passed reset pin and I&sup2;C bus must be configured before the SSD1306OLED 
 #### CircuitPython Example ####
 
 ```python
+from ssd1306oled_circuitpython import SSD1306
+
 # Set up I2C
 i2c = busio.I2C(board.SCL, board.SDA)
 
@@ -37,9 +41,11 @@ reset.direction = digitalio.Direction.OUTPUT
 display = SSD1306OLED(reset, i2c)
 ```
 
-#### CircuitPython Example ####
+#### MicroPython Example ####
 
 ```python
+from ssd1306oled_micropython import SSD1306
+
 # Set up I2C
 i2c = I2C(scl=Pin(5), sda=Pin(4))
 
