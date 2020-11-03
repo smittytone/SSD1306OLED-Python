@@ -231,7 +231,7 @@ class SSD1306OLED:
         Returns:
             The display object
         """
-        self.buffer = bytearray(self.width * int(self.height / 8))
+        for i in range(len(self.buffer)): self.buffer[i] = 0x00
         return self
 
     def set_inverse(self, is_inverse=True):
@@ -259,8 +259,7 @@ class SSD1306OLED:
         Returns:
             The display object
         """
-        self.move(0, 0)
-        return self
+        return self.move(0, 0)
 
     def move(self, x, y):
         """
@@ -271,9 +270,9 @@ class SSD1306OLED:
             y (int) The Y co-ordinate in the range 0 - 32 or 64, depending on model
 
         Returns:
-            The display object
+            The instance (self)
         """
-        if x < 0 or x >= self.width or y < 0 or y >= self.height: return None
+        assert (0 <= x < self.width) and (0 <= y < self.height), "ERROR - Out-of-range co-ordinate(s) passed to move()"
         self.x = x
         self.y = y
         return self
@@ -288,25 +287,20 @@ class SSD1306OLED:
             color (int) The color of the pixel: 1 for set, 0 for clear. Default: 1
 
         Returns:
-            The display object
+            The instance (self)
         """
         # Bail if any co-ordinates are off the screen
-        if x < 0 or x >= self.width or y < 0 or y >= self.height: return None
+        assert (0 <= x < self.width) and (0 <= y < self.height), "ERROR - Out-of-range co-ordinate(s) passed to plot()"
 
         # Get the buffer byte holding the pixel
         byte = self._coords_to_index(x, y)
-        value = self.buffer[byte]
         bit = y - ((y >> 3) << 3)
-
         if color == 1:
             # Set the pixel
-            value = value | (1 << bit)
+            self.buffer[byte] |= (1 << bit)
         else:
             # Clear the pixel
-            value = value & ~(1 << bit)
-
-        # Write the buffer byte back
-        self.buffer[byte] = value
+            self.buffer[byte] &= ~(1 << bit)
         return self
 
     def line(self, x, y, tox, toy, thick=1, color=1):
@@ -322,7 +316,7 @@ class SSD1306OLED:
             color (int) The color of the pixel: 1 for set, 0 for clear. Default: 1
 
         Returns:
-            The display object
+            The instance (self)
         """
         # Make sure we have a thickness of at least one pixel
         if thick < 1: thick = 1;
@@ -330,7 +324,8 @@ class SSD1306OLED:
         # Look for vertical and horizontal lines
         track_by_x = True
         if x == tox: track_by_x = False
-        if y == toy and track_by_x == False: return None
+        if (toy == y) and (track_by_x is False): return self
+        #assert (y != toy) and (track_by_x is False), "ERROR - Bad co-ordinates passed to line()"
 
         # Swap start and end values for L-R raster
         if track_by_x:
@@ -351,7 +346,7 @@ class SSD1306OLED:
             m = float(tox - x) / float(toy - y)
 
         # Run for 'thick' times to generate thickness
-        for j in range(0, thick):
+        for j in range(thick):
             # Run from x to tox, calculating the y offset at each point
             for i in range(start, end):
                 if track_by_x:
@@ -376,58 +371,54 @@ class SSD1306OLED:
             fill (bool) Should the circle be solid (true) or outline (false). Default: false
 
         Returns:
-            The display object
+            The instance (self)
         """
-        for i in range(0, 180):
+        for i in range(180):
             a = x - int(radius * self.SIN_TABLE[i])
             b = y - int(radius * self.COS_TABLE[i])
-
             if 0 <= a < self.width and 0 <= b < self.height:
                 self.plot(a, b, color)
-
                 if fill is True:
                     if a > x:
                         j = x
-                        while True:
+                        while j < a:
                             self.plot(j, b, color)
                             j += 1
-                            if j >= a: break
                     else:
                         j = a + 1
-                        while True:
+                        while j <= x:
                             self.plot(j, b, color)
                             j += 1
-                            if j > x: break
         return self
 
-    def rect(self, x, y, width, height, fill=False):
+    def rect(self, x, y, width, height, colour=1, fill=False):
         """
         Draw a rectangle at the specified co-ordinates
 
         Args:
-            x (int) The start X co-ordinate in the range 0 - 127
-            y (int) The start Y co-ordinate in the range 0 - 32 or 64, depending on model
-            width (int) The width of the rectangle
-            height (int) The height of the rectangle
-            fill (bool) Should the rectangle be solid (true) or outline (false). Default: false
+            x      (int)  The start X co-ordinate in the range 0 - 127
+            y      (int)  The start Y co-ordinate in the range 0 - 32 or 64, depending on model
+            width  (int)  The width of the rectangle
+            height (int)  The height of the rectangle
+            fill   (bool) Should the rectangle be solid (true) or outline (false). Default: false
 
         Returns:
-            The display object
+            The instance (self)
         """
         # Make sure we only draw on the screen
         if x < 0: x = 0
-        if x + width > self.width: width = self.width - x
         if y < 0: y = 0
+        if x + width > self.width: width = self.width - x
         if y + height > self.height: height = self.height - y
-
+        if colour not in (0, 1): colour = 1
         for i in range(y, y + height):
             for j in range(x, x + width):
-                self.plot(j, i)
+                self.plot(j, i, colour)
                 if fill is False and x < j < x + width - 1 and y < i < y + height - 1:
                     self.plot(j, i, 0)
         return self
 
-    def text(self, print_string=None, do_wrap=True):
+    def text(self, print_string, do_wrap=True):
         """
         Write a line of text at the current cursor co-ordinates
 
@@ -437,10 +428,11 @@ class SSD1306OLED:
         Returns:
             The display object
         """
+        assert len(print_string) > 0, "ERROR - Zero-length string passed to text()"
         return self._draw_text(print_string, do_wrap, False)
 
 
-    def text_2x(self, print_string=None, do_wrap=True):
+    def text_2x(self, print_string, do_wrap=True):
         """
         Write a line of double-size text at the current cursor co-ordinates
 
@@ -450,6 +442,7 @@ class SSD1306OLED:
         Returns:
             The display object
         """
+        assert len(print_string) > 0, "ERROR - Zero-length string passed to text_2x()"
         return self._draw_text(print_string, do_wrap, True)
 
     def length_of_string(self, print_string):
@@ -463,11 +456,11 @@ class SSD1306OLED:
             The string's length in pixels
         """
         length = 0
-        if print_string is None or len(print_string) == 0: return -1
-        for i in range(0, len(print_string)):
-            asc = ord(print_string[i]) - 32
-            glyph = self.CHARSET[asc]
-            length += (len(glyph) + 1)
+        if len(print_string) > 0:
+            for i in range(0, len(print_string)):
+                asc = ord(print_string[i]) - 32
+                glyph = self.CHARSET[asc]
+                length += (len(glyph) + 1)
         return length
 
     # ***** PRIVATE FUNCTIONS *****
@@ -485,45 +478,24 @@ class SSD1306OLED:
         """
         Convert pixel co-ordinates to a bytearray index
         Calling function should check for valid co-ordinates first
-
-        Returns:
-            An index value (integer)
         """
         return ((y >> 3) * self.width) + x
 
     def _indexToCoords(self, idx):
         """
         Convert bytearray index to pixel co-ordinates
-
-        Returns:
-            X and Y co-ordinates in a tuple
         """
         y = idx >> 4
         x = idx - (y << 4)
         return (x, y)
 
-    def _flip(self, value):
-        """
-        Rotates the character array from the saved state
-        to that required by the screen orientation
-
-        Returns:
-            Flipped value as integer
-        """
-        flipped = 0
-        for i in range (0, 8):
-            if (value & (1 << i)) > 0:
-                flipped += (1 << (7 - i))
-        return flipped
-
     def _draw_text(self, the_string, do_wrap, do_double):
         """
         Generic text rendering routine
         """
-        if the_string is None or len(the_string) == 0: return None
-
         x = self.x
         y = self.y
+        space_size = 4 if do_double else 1
         bit_max = 16 if do_double else 8
 
         for i in range(0, len(the_string)):
@@ -585,7 +557,7 @@ class SSD1306OLED:
 
             # Add spacer if we can
             if i < len(the_string) - 1:
-                x += (3 if do_double else 1)
+                x += space_size
                 if x >= self.width:
                     if not do_wrap: return self
                     if y + bit_max < self.height:
@@ -595,14 +567,23 @@ class SSD1306OLED:
                         break
         return self
 
+    def _flip(self, value):
+        """
+        Rotates the character array from the saved state
+        to that required by the screen orientation
+        """
+        flipped = 0
+        for i in range (0, 8):
+            if (value & (1 << i)) > 0:
+                flipped += (1 << (7 - i))
+        return flipped
+
     def _char_plot(self, x, y, k, c, a):
         """
         Write a pixel from a character glyph to the buffer
         """
         b = self._coords_to_index(x, y + k)
-        v = self.buffer[b]
-        if c & (1 << k) != 0: v = v | (1 << a)
-        self.buffer[b] = v
+        if c & (1 << k) != 0: self.buffer[b] |= (1 << a)
 
     def _stretch(self, x):
         """
@@ -614,7 +595,7 @@ class SSD1306OLED:
         x = x | x << 1
         return x
 
-    def _set_rst(is_on=True):
+    def _set_rst(self, is_on=True):
         """
         Select GPIO pin setting mechanism by Python type
         """
