@@ -70,7 +70,7 @@ ENTRY POINT
 """
 if __name__ == '__main__':
     # Set the random seed
-    seed()
+    seed(1000)
 
     # Set up I2C on the FT232H Breakout
     i2c = busio.I2C(board.SCL, board.SDA)
