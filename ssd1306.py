@@ -45,7 +45,6 @@ class SSD1306OLED:
     #SSD1306_SET_VERTICAL_SCROLL_AREA = 0xA3
     #SSD1306_COMSCANINC = 0xC0
 
-
     CHARSET = [
         b"\x00\x00",                # space - Ascii 32
         b"\xfa",                    # !
@@ -282,8 +281,8 @@ class SSD1306OLED:
         Plot a point (or clear) the pixel at the specified co-ordnates
 
         Args:
-            x (int) The X co-ordinate in the range 0 - 127
-            y (int) The Y co-ordinate in the range 0 - 32 or 64, depending on model
+            x     (int) The X co-ordinate in the range 0 - 127
+            y     (int) The Y co-ordinate in the range 0 - 32 or 64, depending on model
             color (int) The color of the pixel: 1 for set, 0 for clear. Default: 1
 
         Returns:
@@ -291,8 +290,7 @@ class SSD1306OLED:
         """
         # Bail if any co-ordinates are off the screen
         assert (0 <= x < self.width) and (0 <= y < self.height), "ERROR - Out-of-range co-ordinate(s) passed to plot()"
-
-        # Get the buffer byte holding the pixel
+        if colour not in (0, 1): colour = 1
         byte = self._coords_to_index(x, y)
         bit = y - ((y >> 3) << 3)
         if color == 1:
@@ -303,24 +301,24 @@ class SSD1306OLED:
             self.buffer[byte] &= ~(1 << bit)
         return self
 
-    def line(self, x, y, tox, toy, thick=1, color=1):
+    def line(self, x, y, tox, toy, thick=1, colour=1):
         """
         Draw a line between the specified co-ordnates
 
         Args:
-            x (int) The start X co-ordinate in the range 0 - 127
-            y (int) The start Y co-ordinate in the range 0 - 32 or 64, depending on model
-            tox (int) The end X co-ordinate in the range 0 - 127
-            toy (int) The end Y co-ordinate in the range 0 - 32 or 64, depending on model
-            think (int) The thickness of the line in pixels. Default: 1
-            color (int) The color of the pixel: 1 for set, 0 for clear. Default: 1
+            x      (int) The start X co-ordinate in the range 0 - 127
+            y      (int) The start Y co-ordinate in the range 0 - 32 or 64, depending on model
+            tox    (int) The end X co-ordinate in the range 0 - 127
+            toy    (int) The end Y co-ordinate in the range 0 - 32 or 64, depending on model
+            think  (int) The thickness of the line in pixels. Default: 1
+            colour (int) The colour of the pixel: 1 for set, 0 for clear. Default: 1
 
         Returns:
             The instance (self)
         """
         # Make sure we have a thickness of at least one pixel
         if thick < 1: thick = 1;
-
+        if colour not in (0, 1): colour = 1
         # Look for vertical and horizontal lines
         track_by_x = True
         if x == tox: track_by_x = False
@@ -352,11 +350,11 @@ class SSD1306OLED:
                 if track_by_x:
                     dy = y + int(m * (i - x)) + j;
                     if (0 <= i < self.width) and (0 <= dy < self.height):
-                        self.plot(i, dy, color)
+                        self.plot(i, dy, colour)
                 else:
                     dx = x + int(m * (i - y)) + j;
                     if (0 <= i < self.height) and (0 <= dx < self.width):
-                        self.plot(dx, i, color)
+                        self.plot(dx, i, colour)
         return self
 
     def circle(self, x, y, radius, color=1, fill=False):

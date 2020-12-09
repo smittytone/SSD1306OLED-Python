@@ -2,11 +2,11 @@
 
 A hardware driver for the [Adafruit 128x32 OLED](https://www.adafruit.com/product/931) and [Adafruit 128x64 OLED](https://www.adafruit.com/product/326) panels, which are based on the Solomon SSD1306 controller. The OLEDs communicate over any I&sup2;C bus.
 
-The driver is available in [MicroPython](http://micropython.org) and [CircuitPython](https://circuitpython.org) versions.
+The driver is compatible with [MicroPython](http://micropython.org) and [CircuitPython](https://circuitpython.org).
 
 ### Character Set ###
 
-The driver contains a full, proportionally spaced Ascii character set.
+The driver contains a full, proportionally spaced Ascii character set with Ascii values 32 through 127. Codes 0 through 31 are used for user-defined characters.
 
 ### I2C Addressing ###
 
@@ -28,31 +28,33 @@ The passed reset pin and I&sup2;C bus must be configured before the SSD1306OLED 
 #### CircuitPython Example ####
 
 ```python
-from ssd1306oled_circuitpython import SSD1306
+import board
+import busio
+from ssd1306 import SSD1306
 
 # Set up I2C
 i2c = busio.I2C(board.SCL, board.SDA)
 
-# Set up the RST pin
+# Set up the RST pin (pin 7 on this board)
 reset = digitalio.DigitalInOut(board.D7)
 reset.direction = digitalio.Direction.OUTPUT
 
-# Set up OLED display at the default address
+# Set up OLED display using the default settings
 display = SSD1306OLED(reset, i2c)
 ```
 
 #### MicroPython Example ####
 
 ```python
-from ssd1306oled_micropython import SSD1306
+from ssd1306 import SSD1306
 
 # Set up I2C
 i2c = I2C(scl=Pin(5), sda=Pin(4))
 
 # Set up the RST pin
-reset = Pin(2, Pin.out)
+reset = Pin(7, Pin.out)
 
-# Set up OLED display at the default address
+# Set up OLED display using the default settings
 display = SSD1306OLED(reset, i2c)
 ```
 
@@ -136,7 +138,7 @@ display.circle(47, 16, 14, 1, True).circle(81, 16, 14, 1, True).draw();
 
 ### text(*the_text[, do_wrap]*) ###
 
-Render the specified text into the buffer at the current co-ordinates. If *do_wrap* is True (the default), wrap text onto a new line if necessary and possible.
+Render the specified text into the buffer at the current co-ordinates, set using [*move()*](#movex-y). If *do_wrap* is `True` (the default), wrap text onto a new line if necessary and possible.
 
 *text()* does not update the screen — call [*draw()*](#draw) to do so.
 
@@ -144,12 +146,12 @@ Render the specified text into the buffer at the current co-ordinates. If *do_wr
 
 ```python
 for i in range (0, 56):
-    display.clear().move(0, i).text("Line " + str(i) + " 16px").draw()
+    display.clear().move(0, i).text("Line " + str(i) + " 8px").draw()
 ```
 
 ### text_2x(*the_text[, do_wrap]*) ###
 
-Render the specified text at double-size into the buffer at the current co-ordinates. If *do_wrap* is True (the default), wrap text onto a new line if necessary and possible.
+Render the specified text at double-size into the buffer at the current co-ordinates, set using [*move()*](#movex-y). If *do_wrap* is `True` (the default), wrap text onto a new line if necessary and possible.
 
 *text()* does not update the screen — call [*draw()*](#draw) to do so.
 
@@ -162,7 +164,7 @@ for i in range (0, 49):
 
 ### length_of_string(*the_string*) ###
 
-Returns the length of the string in pixels.
+Returns the length of the string in pixels. This assumes standard-size (8px) characters and a single-pixel space between adjacent characters.
 
 ## Release Notes ##
 

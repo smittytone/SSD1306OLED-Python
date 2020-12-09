@@ -55,23 +55,6 @@ def eyes_clear(oled):
     # Draw blank open eyes
     oled.circle(47 - CENTRE_SEP, 16, 16, 1, True).circle(81 + CENTRE_SEP, 16, 16, 1, True)
 
-def mouth_open(oled, is_wide=False):
-    # Draw the teeth: two close rows or open wide in anger
-    x = 29
-    y = 44
-    g = 5 if is_wide is False else 16
-
-    # Clear the space
-    oled.rect(x, y, 80, 20, 0)
-    for i in range(14):
-        oled.rect(x, y, 4, 4, 1, True)
-        oled.rect(x, y + g, 4, 4, 1, True)
-        x += 5
-    if is_wide:
-        # Fangs!
-        oled.rect(34, 44, 4, 13, 1, True)
-        oled.rect(89, 44, 4, 13, 1, True)
-
 """
 ENTRY POINT
 """
@@ -82,14 +65,14 @@ if __name__ == '__main__':
         pass
 
     width = 128
-    height = 64
+    height = 32
 
     # Set up the RST pin
     reset = digitalio.DigitalInOut(board.D5)
     reset.direction = digitalio.Direction.OUTPUT
 
     # Set up OLED display
-    display = SSD1306OLED(reset, i2c, 0x3D, width, height)
+    display = SSD1306OLED(reset, i2c)
 
     mood_changed = False
     mood = 0
@@ -98,7 +81,6 @@ if __name__ == '__main__':
     pupil_direction = randint(0, 8)
     blink_count = 0
     mood_count = 0
-    mouth_open(display)
 
     while True:
         blink_count += 1
@@ -113,7 +95,6 @@ if __name__ == '__main__':
         if eye_state == EYE_STATE_CLOSED:
             # Draw the closed eyes
             eyes_closed(display);
-
             blink_count = 0
             next_state = EYE_STATE_OPEN
         else:
@@ -124,7 +105,6 @@ if __name__ == '__main__':
             else:
                 if r > 60: pupil_direction = randint(0, 8)
                 if r == 3: pupil_direction = 9
-
             # Draw eyes open
             eyes_open(display, PUPIL_SIZE_NORMAL, pupil_direction)
 
@@ -136,7 +116,6 @@ if __name__ == '__main__':
         if mood == EYE_MOOD_CROSS:
             # Clear the space above each eye
             display.line(38 - CENTRE_SEP, -10, 64 - CENTRE_SEP, 0, 10, 0).line(66 + CENTRE_SEP, 0, 92 + CENTRE_SEP, -10, 10, 0)
-            mouth_open(display, True)
 
             if eye_state == EYE_STATE_CLOSED:
                 # Eye is closed, so close the outline
@@ -149,12 +128,8 @@ if __name__ == '__main__':
                 # Eye is closed, so close the outline
                 display.line(34 - CENTRE_SEP, 9, 53 - CENTRE_SEP, 1, 2, 1).line(75 + CENTRE_SEP, 1, 94 + CENTRE_SEP, 9, 2, 1)
 
-        # Gob
-        mouth_open(display, (mood == EYE_MOOD_CROSS))
-
         # Did the eye state change? Set the new state now for the next iteration
         if next_state != -1: eye_state = next_state
-        display.draw()
 
         # Look for a change of mood every 60s
         if mood_count > 60 / DELAY:
@@ -169,5 +144,6 @@ if __name__ == '__main__':
                 mood_changed = True
                 new_mood = EYE_MOOD_NORMAL
 
-        # Pause for breath
+        # Draw the display and pause for breath
+        display.draw()
         time.sleep(DELAY)
