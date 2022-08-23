@@ -2,9 +2,9 @@ class SSD1306OLED:
     """
     A simple driver for the I2C-connected Solomon SSD1306 controller chip and an OLED display.
     For example: https://www.adafruit.com/product/931
-    This release is written for CircuitPython
+    This release is written for MicroPython and CircuitPython
 
-    Version:   1.0.0
+    Version:   2.0.0
     Author:    smittytone
     Copyright: 2020, Tony Smith
     Licence:   MIT
@@ -168,8 +168,12 @@ class SSD1306OLED:
         0.322,0.355,0.387,0.419,0.451,0.482,0.512,0.542,0.571,0.599,0.627,0.654,0.680,0.705,0.730,0.753,0.776,0.797,0.818,0.837,
         0.856,0.874,0.890,0.906,0.920,0.933,0.945,0.956,0.966,0.974,0.981,0.988,0.992,0.996,0.999,1.000]
 
-
+    
+    # *********** CONSTRUCTOR **********
+    
     def __init__(self, reset_pin, i2c, address=0x3C, width=128, height=32):
+        assert 0x00 <= i2c_address < 0x80, "ERROR - Invalid I2C address in HT16K33()"
+        
         # Just in case it hasn't been imported by the caller
         import time
 
@@ -222,17 +226,9 @@ class SSD1306OLED:
         # Clear the display
         self.clear()
         self.draw()
-
-    def clear(self):
-        """
-        Clears the display buffer by creating a new one
-
-        Returns:
-            The display object
-        """
-        for i in range(len(self.buffer)): self.buffer[i] = 0x00
-        return self
-
+    
+    # *********** PUBLIC METHODS **********
+    
     def set_inverse(self, is_inverse=True):
         """
         Set the entire display to black-on-white or white-on-black
@@ -244,6 +240,16 @@ class SSD1306OLED:
             self.i2c.writeto(self.address, bytes([0x00, self.SSD1306_INVERTDISPLAY]));
         else:
             self.i2c.writeto(self.address, bytes([0x00, self.SSD1306_NORMALDISPLAY]));
+
+    def clear(self):
+        """
+        Clears the display buffer by creating a new one
+
+        Returns:
+            The display object
+        """
+        for i in range(len(self.buffer)): self.buffer[i] = 0x00
+        return self
 
     def draw(self):
         """
@@ -461,7 +467,7 @@ class SSD1306OLED:
                 length += (len(glyph) + 1)
         return length
 
-    # ***** PRIVATE FUNCTIONS *****
+    # ********** PRIVATE METHODS **********
 
     def _render(self):
         """
@@ -595,7 +601,10 @@ class SSD1306OLED:
 
     def _set_rst(self, is_on=True):
         """
-        Select GPIO pin setting mechanism by Python type
+        Select GPIO pin setting mechanism by Python type.
+        
+        Args:
+            is_on (Bool) Are we toggling RST on?
         """
         if self.is_micropython:
             if is_on:

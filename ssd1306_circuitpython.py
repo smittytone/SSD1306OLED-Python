@@ -4,7 +4,7 @@ class SSD1306OLED:
     For example: https://www.adafruit.com/product/931
     This release is written for CircuitPython
 
-    Version:   1.0.0
+    Version:   1.1.0
     Author:    smittytone
     Copyright: 2020, Tony Smith
     Licence:   MIT

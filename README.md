@@ -1,4 +1,4 @@
-# SSD1306OLED Python 1.0.0 #
+# SSD1306OLED Python 2.0.0 #
 
 A hardware driver for the [Adafruit 128x32 OLED](https://www.adafruit.com/product/931) and [Adafruit 128x64 OLED](https://www.adafruit.com/product/326) panels, which are based on the Solomon SSD1306 controller. The OLEDs communicate over any I&sup2;C bus.
 
@@ -46,6 +46,7 @@ display = SSD1306OLED(reset, i2c)
 #### MicroPython Example ####
 
 ```python
+from machine import I2C, Pin
 from ssd1306 import SSD1306
 
 # Set up I2C
@@ -87,11 +88,11 @@ This method is called to set the display to black-on-white (`True`) or white-on-
 
 ### move(*x, y*) ###
 
-This method moves the text cursor to the specified co-ordinates.
+This method moves the graphics cursor to the specified co-ordinates.
 
 ### home() ###
 
-This method moves the text cursor to the home position: the top left of the screen (co-ordinates 0,0).
+This method moves the graphics cursor to the home position: the top left of the screen (co-ordinates 0,0).
 
 ### plot(*x, y[, colour]*) ###
 
