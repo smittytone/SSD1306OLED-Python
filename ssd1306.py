@@ -212,7 +212,7 @@ class SSD1306OLED:
         self.i2c.writeto(self.address, bytes([0x00, self.SSD1306_MEMORYMODE, 0x00]))
         self.i2c.writeto(self.address, bytes([0x00, self.SSD1306_SEGREMAP]))
         self.i2c.writeto(self.address, bytes([0x00, self.SSD1306_COMSCANDEC]))
-        self.i2c.writeto(self.address, bytes([0x00, self.SSD1306_SETCOMPINS, 0x02 if self.height == 32 or self.height == 16 else 0x12]))
+        self.i2c.writeto(self.address, bytes([0x00, self.SSD1306_SETCOMPINS, 0x02 if self.height in (16, 32) else 0x12]))
         self.i2c.writeto(self.address, bytes([0x00, self.SSD1306_SETCONTRAST, 0x8F]))
         self.i2c.writeto(self.address, bytes([0x00, self.SSD1306_SETPRECHARGE, 0xF1]))
         self.i2c.writeto(self.address, bytes([0x00, self.SSD1306_SETVCOMDETECT, 0x40]))
