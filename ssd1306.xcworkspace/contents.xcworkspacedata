@@ -26,6 +26,9 @@
          <FileRef
             location = "group:macinfo_128x64.py">
          </FileRef>
+         <FileRef
+            location = "group:/Users/tsmith/GitHub/SSD1306OLED-Python/examples/micropython/test_128x64.py">
+         </FileRef>
       </Group>
    </Group>
    <FileRef

@@ -1,8 +1,10 @@
-'''
+"""
 Runs on a Raspberry Pi Pico with MicroPython installed
-'''
+"""
 
-# IMPORTS
+"""
+IMPORTS
+"""
 from utime import sleep
 from machine import I2C, Pin
 from random import randint
