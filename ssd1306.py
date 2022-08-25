@@ -6,11 +6,12 @@ class SSD1306OLED:
 
     Version:   2.0.0
     Author:    smittytone
-    Copyright: 2020, Tony Smith
+    Copyright: 2022, Tony Smith
     Licence:   MIT
     """
 
-    # CONSTANTS
+    # *********** CONSTANTS **********
+    
     SSD1306_MEMORYMODE = 0x20
     SSD1306_COLUMNADDR = 0x21
     SSD1306_PAGEADDR = 0x22
@@ -237,25 +238,9 @@ class SSD1306OLED:
             is_inverse (bool): should the display be black-on-white (True) or white-on-black (False).
         """
         if is_inverse:
-            self.i2c.writeto(self.address, bytes([0x00, self.SSD1306_INVERTDISPLAY]));
+            self.i2c.writeto(self.address, bytes([0x00, self.SSD1306_INVERTDISPLAY]))
         else:
-            self.i2c.writeto(self.address, bytes([0x00, self.SSD1306_NORMALDISPLAY]));
-
-    def clear(self):
-        """
-        Clears the display buffer by creating a new one
-
-        Returns:
-            The display object
-        """
-        for i in range(len(self.buffer)): self.buffer[i] = 0x00
-        return self
-
-    def draw(self):
-        """
-        Draw the current buffer contents on the screen
-        """
-        self._render()
+            self.i2c.writeto(self.address, bytes([0x00, self.SSD1306_NORMALDISPLAY]))
 
     def home(self):
         """
@@ -323,7 +308,7 @@ class SSD1306OLED:
             The instance (self)
         """
         # Make sure we have a thickness of at least one pixel
-        if thick < 1: thick = 1;
+        thick = max(thick, 1)
         if colour not in (0, 1): colour = 1
         # Look for vertical and horizontal lines
         track_by_x = True
@@ -334,16 +319,16 @@ class SSD1306OLED:
         # Swap start and end values for L-R raster
         if track_by_x:
             if x > tox:
-                a = x;
-                x = tox;
+                a = x
+                x = tox
                 tox = a
             start = x
             end = tox
             m = float(toy - y) / float(tox - x)
         else:
             if y > toy:
-                a = y;
-                y = toy;
+                a = y
+                y = toy
                 toy = a
             start = y
             end = toy
@@ -354,11 +339,11 @@ class SSD1306OLED:
             # Run from x to tox, calculating the y offset at each point
             for i in range(start, end):
                 if track_by_x:
-                    dy = y + int(m * (i - x)) + j;
+                    dy = y + int(m * (i - x)) + j
                     if (0 <= i < self.width) and (0 <= dy < self.height):
                         self.plot(i, dy, colour)
                 else:
-                    dx = x + int(m * (i - y)) + j;
+                    dx = x + int(m * (i - y)) + j
                     if (0 <= i < self.height) and (0 <= dx < self.width):
                         self.plot(dx, i, colour)
         return self
@@ -410,8 +395,8 @@ class SSD1306OLED:
             The instance (self)
         """
         # Make sure we only draw on the screen
-        if x < 0: x = 0
-        if y < 0: y = 0
+        x = max(x, 0)
+        y = max(y, 0)
         if x + width > self.width: width = self.width - x
         if y + height > self.height: height = self.height - y
         if colour not in (0, 1): colour = 1
@@ -467,6 +452,22 @@ class SSD1306OLED:
                 length += (len(glyph) + 1)
         return length
 
+    def clear(self):
+        """
+        Clears the display buffer by creating a new one
+
+        Returns:
+            The display object
+        """
+        for i in range(len(self.buffer)): self.buffer[i] = 0x00
+        return self
+
+    def draw(self):
+        """
+        Draw the current buffer contents on the screen
+        """
+        self._render()
+
     # ********** PRIVATE METHODS **********
 
     def _render(self):
@@ -485,7 +486,7 @@ class SSD1306OLED:
         """
         return ((y >> 3) * self.width) + x
 
-    def _indexToCoords(self, idx):
+    def _index_to_coords(self, idx):
         """
         Convert bytearray index to pixel co-ordinates
         """
@@ -530,7 +531,7 @@ class SSD1306OLED:
                     for a in range(6, -1, -1):
                         for b in range(1, 3):
                             if (col_0 >> a & 3 == 3 - b) and (col_1 >> a & 3 == b):
-                                col_0_right |= (1 << ((a * 2) + b));
+                                col_0_right |= (1 << ((a * 2) + b))
                                 col_1_left |= (1 << ((a * 2) + 3 - b))
 
                 z = (y - ((y >> 3) << 3)) - 1
@@ -593,9 +594,9 @@ class SSD1306OLED:
         """
         Pixel-doubles an 8-bit value to 16 bits
         """
-        x = (x & 0xF0) << 4 | (x & 0x0F);
-        x = (x << 2 | x) & 0x3333;
-        x = (x << 1 | x) & 0x5555;
+        x = (x & 0xF0) << 4 | (x & 0x0F)
+        x = (x << 2 | x) & 0x3333
+        x = (x << 1 | x) & 0x5555
         x = x | x << 1
         return x
 
