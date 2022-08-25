@@ -50,10 +50,10 @@ from machine import I2C, Pin
 from ssd1306 import SSD1306
 
 # Set up I2C
-i2c = I2C(scl=Pin(5), sda=Pin(4))
+i2c = I2C(0, scl=Pin(9), sda=Pin(8)) # Raspberry Pi Pico
 
 # Set up the RST pin
-reset = Pin(7, Pin.out)
+reset = Pin(7, Pin.OUT)
 
 # Set up OLED display using the default settings
 display = SSD1306OLED(reset, i2c)

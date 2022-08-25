@@ -168,12 +168,12 @@ class SSD1306OLED:
         0.322,0.355,0.387,0.419,0.451,0.482,0.512,0.542,0.571,0.599,0.627,0.654,0.680,0.705,0.730,0.753,0.776,0.797,0.818,0.837,
         0.856,0.874,0.890,0.906,0.920,0.933,0.945,0.956,0.966,0.974,0.981,0.988,0.992,0.996,0.999,1.000]
 
-    
+
     # *********** CONSTRUCTOR **********
-    
+
     def __init__(self, reset_pin, i2c, address=0x3C, width=128, height=32):
-        assert 0x00 <= i2c_address < 0x80, "ERROR - Invalid I2C address in HT16K33()"
-        
+        assert 0x00 <= address < 0x80, "ERROR - Invalid I2C address in HT16K33()"
+
         # Just in case it hasn't been imported by the caller
         import time
 
@@ -226,9 +226,9 @@ class SSD1306OLED:
         # Clear the display
         self.clear()
         self.draw()
-    
+
     # *********** PUBLIC METHODS **********
-    
+
     def set_inverse(self, is_inverse=True):
         """
         Set the entire display to black-on-white or white-on-black
@@ -236,7 +236,7 @@ class SSD1306OLED:
         Args:
             is_inverse (bool): should the display be black-on-white (True) or white-on-black (False).
         """
-        if is_inverse is True:
+        if is_inverse:
             self.i2c.writeto(self.address, bytes([0x00, self.SSD1306_INVERTDISPLAY]));
         else:
             self.i2c.writeto(self.address, bytes([0x00, self.SSD1306_NORMALDISPLAY]));
@@ -282,14 +282,14 @@ class SSD1306OLED:
         self.y = y
         return self
 
-    def plot(self, x, y, color=1):
+    def plot(self, x, y, colour=1):
         """
         Plot a point (or clear) the pixel at the specified co-ordnates
 
         Args:
-            x     (int) The X co-ordinate in the range 0 - 127
-            y     (int) The Y co-ordinate in the range 0 - 32 or 64, depending on model
-            color (int) The color of the pixel: 1 for set, 0 for clear. Default: 1
+            x      (int) The X co-ordinate in the range 0 - 127
+            y      (int) The Y co-ordinate in the range 0 - 32 or 64, depending on model
+            colour (int) The colour of the pixel: 1 for set, 0 for clear. Default: 1
 
         Returns:
             The instance (self)
@@ -299,7 +299,7 @@ class SSD1306OLED:
         if colour not in (0, 1): colour = 1
         byte = self._coords_to_index(x, y)
         bit = y - ((y >> 3) << 3)
-        if color == 1:
+        if colour == 1:
             # Set the pixel
             self.buffer[byte] |= (1 << bit)
         else:
@@ -363,16 +363,16 @@ class SSD1306OLED:
                         self.plot(dx, i, colour)
         return self
 
-    def circle(self, x, y, radius, color=1, fill=False):
+    def circle(self, x, y, radius, colour=1, fill=False):
         """
         Draw a circle at the specified co-ordnates
 
         Args:
-            x (int) The centre X co-ordinate in the range 0 - 127
-            y (int) The centre Y co-ordinate in the range 0 - 32 or 64, depending on model
+            x (int)      The centre X co-ordinate in the range 0 - 127
+            y (int)      The centre Y co-ordinate in the range 0 - 32 or 64, depending on model
             radius (int) The radius of the circle
-            color (int) The color of the pixel: 1 for set, 0 for clear. Default: 1
-            fill (bool) Should the circle be solid (true) or outline (false). Default: false
+            colour (int) The colour of the pixel: 1 for set, 0 for clear. Default: 1
+            fill (bool)  Should the circle be solid (true) or outline (false). Default: false
 
         Returns:
             The instance (self)
@@ -381,17 +381,17 @@ class SSD1306OLED:
             a = x - int(radius * self.SIN_TABLE[i])
             b = y - int(radius * self.COS_TABLE[i])
             if 0 <= a < self.width and 0 <= b < self.height:
-                self.plot(a, b, color)
-                if fill is True:
+                self.plot(a, b, colour)
+                if fill:
                     if a > x:
                         j = x
                         while j < a:
-                            self.plot(j, b, color)
+                            self.plot(j, b, colour)
                             j += 1
                     else:
                         j = a + 1
                         while j <= x:
-                            self.plot(j, b, color)
+                            self.plot(j, b, colour)
                             j += 1
         return self
 
@@ -602,7 +602,7 @@ class SSD1306OLED:
     def _set_rst(self, is_on=True):
         """
         Select GPIO pin setting mechanism by Python type.
-        
+
         Args:
             is_on (Bool) Are we toggling RST on?
         """
