@@ -14,20 +14,20 @@
             location = "group:eyes_128x64.py">
          </FileRef>
          <FileRef
-            location = "group:test_28x64.py">
+            location = "group:/Users/smitty/GitHub/ssd1306oled-python/examples/circuitpython/test_128x64.py">
          </FileRef>
       </Group>
       <Group
          location = "group:micropython"
          name = "micropython">
          <FileRef
+            location = "group:eyes_128x32.py">
+         </FileRef>
+         <FileRef
             location = "group:eyes_128x64.py">
          </FileRef>
          <FileRef
-            location = "group:macinfo_128x64.py">
-         </FileRef>
-         <FileRef
-            location = "group:/Users/tsmith/GitHub/SSD1306OLED-Python/examples/micropython/test_128x64.py">
+            location = "group:test_128x64.py">
          </FileRef>
       </Group>
    </Group>

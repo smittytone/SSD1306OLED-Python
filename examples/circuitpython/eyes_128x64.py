@@ -1,8 +1,19 @@
-# IMPORTS
-import time
+"""
+Runs on a Raspberry Pi Pico with MicroPython installed
+
+SSID1306 OLED board connected to:
+    SCL -> Pico GPIO 9
+    SDA -> Pico GPIO 8
+    RST -> Pico GPIO 19
+"""
+
+"""
+IMPORTS
+"""
 import board
 import busio
 import digitalio
+from time import sleep
 from random import randint
 from ssd1306 import SSD1306OLED
 
@@ -76,19 +87,18 @@ def mouth_open(oled, is_wide=False):
 ENTRY POINT
 """
 if __name__ == '__main__':
-    # Set up I2C on the FT232H Breakout
-    i2c = busio.I2C(board.SCL, board.SDA)
+    # Set up I2C
+    i2c = busio.I2C(board.GP9, board.GP8)
     while not i2c.try_lock():
         pass
 
-    width = 128
-    height = 64
-
     # Set up the RST pin
-    reset = digitalio.DigitalInOut(board.D5)
+    reset = digitalio.DigitalInOut(board.GP19)
     reset.direction = digitalio.Direction.OUTPUT
 
     # Set up OLED display
+    width = 128
+    height = 64
     display = SSD1306OLED(reset, i2c, 0x3D, width, height)
 
     mood_changed = False

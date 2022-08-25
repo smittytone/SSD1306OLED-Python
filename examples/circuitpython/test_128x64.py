@@ -10,9 +10,11 @@ SSID1306 OLED board connected to:
 """
 IMPORTS
 """
-from utime import sleep
-from machine import I2C, Pin
+import board
+import busio
+import digitalio
 from random import randint
+from time import sleep
 from ssd1306 import SSD1306OLED
 
 """
@@ -27,12 +29,15 @@ RUNTIME START
 """
 if __name__ == '__main__':
     # Set up I2C
-    i2c = I2C(0, scl=Pin(9), sda=Pin(8)) # Raspberry Pi Pico
+    i2c = busio.I2C(board.GP9, board.GP8)
+    while not i2c.try_lock():
+        pass
 
     # Set up the RST pin
-    reset = Pin(19, Pin.OUT) # Raspberry Pi Pico
+    reset = digitalio.DigitalInOut(board.GP19)
+    reset.direction = digitalio.Direction.OUTPUT
 
-    # Set up OLED display for a 128x64 panel
+    # Set up OLED display
     display = SSD1306OLED(reset, i2c, 0x3D, OLED_WIDTH, OLED_HEIGHT)
     
     while True:
