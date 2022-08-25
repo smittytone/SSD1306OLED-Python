@@ -1,11 +1,15 @@
+'''
+Runs on a host Mac connnected to the SSD1306
+via an FT232H breakout board
+'''
+
 # IMPORTS
-import time
 import datetime
 import psutil
 from machine import I2C, Pin, RTC
 from utime import localtime, sleep
 from micropython import const
-from ssd1306_micropython import SSD1306OLED
+from ssd1306 import SSD1306OLED
 
 # CONSTANTS
 DELAY = 0.5
@@ -91,4 +95,4 @@ if __name__ == '__main__':
         display.draw()
 
         # Pause for breath
-        time.sleep(DELAY)
+        sleep(DELAY)

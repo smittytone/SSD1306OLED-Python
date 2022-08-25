@@ -1,8 +1,8 @@
 # IMPORTS
-import time
 import board
 import busio
 import digitalio
+from time import sleep
 from random import randint
 from ssd1306 import SSD1306OLED
 
@@ -146,4 +146,4 @@ if __name__ == '__main__':
 
         # Draw the display and pause for breath
         display.draw()
-        time.sleep(DELAY)
+        sleep(DELAY)

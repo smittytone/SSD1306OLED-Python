@@ -1,5 +1,9 @@
+'''
+Runs on a Raspberry Pi Pico with MicroPython installed
+'''
+
 # IMPORTS
-import time
+from utime import sleep
 from machine import I2C, Pin
 from random import randint
 from ssd1306 import SSD1306OLED
@@ -78,9 +82,9 @@ if __name__ == '__main__':
     i2c = I2C(0, scl=Pin(9), sda=Pin(8)) # Raspberry Pi Pico
 
     # Set up the RST pin
-    reset = Pin(19, Pin.OUT)
+    reset = Pin(19, Pin.OUT) # Raspberry Pi Pico
 
-    # Set up OLED display using the default settings
+    # Set up OLED display for a 128x64 panel
     width = 128
     height = 64
     display = SSD1306OLED(reset, i2c, 0x3D, width, height)
@@ -164,4 +168,4 @@ if __name__ == '__main__':
                 new_mood = EYE_MOOD_NORMAL
 
         # Pause for breath
-        time.sleep(DELAY)
+        sleep(DELAY)

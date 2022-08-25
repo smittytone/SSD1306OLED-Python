@@ -1,6 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Workspace
    version = "1.0">
+   <Group
+      location = "group:examples"
+      name = "examples">
+      <Group
+         location = "group:circuitpython"
+         name = "circuitpython">
+         <FileRef
+            location = "group:eyes_128x32.py">
+         </FileRef>
+         <FileRef
+            location = "group:eyes_128x64.py">
+         </FileRef>
+         <FileRef
+            location = "group:test_28x64.py">
+         </FileRef>
+      </Group>
+      <Group
+         location = "group:micropython"
+         name = "micropython">
+         <FileRef
+            location = "group:eyes_128x64.py">
+         </FileRef>
+         <FileRef
+            location = "group:macinfo_128x64.py">
+         </FileRef>
+      </Group>
+   </Group>
    <FileRef
       location = "group:ssd1306.py">
    </FileRef>
