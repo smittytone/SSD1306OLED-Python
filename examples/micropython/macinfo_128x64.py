@@ -1,6 +1,11 @@
 '''
 Runs on a host Mac connnected to the SSD1306
 via an FT232H breakout board
+
+SSID1306 OLED board connected to:
+    SCL -> FT232H GPIO 5
+    SDA -> FT232H GPIO 4
+    RST -> FT232H GPIO 2
 '''
 
 # IMPORTS
