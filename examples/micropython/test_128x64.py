@@ -52,11 +52,18 @@ if __name__ == '__main__':
         display.draw()
         sleep(PAUSE)
 
+        display.clear().draw()
         for i in range(0,21,4):
             display.line(i * 4, 63, 80, 0)
         display.draw()
         sleep(PAUSE * 5)
         
+        display.clear().draw()
+        for i in range(0,21,4):
+            display.cirle(80 - i * 4, 31, 30)
+        display.draw()
+        sleep(PAUSE)
+
         # Draw a chart
         display.clear().draw()
         for i in range(0,64,4):
