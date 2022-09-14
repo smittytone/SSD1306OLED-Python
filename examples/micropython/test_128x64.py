@@ -27,13 +27,16 @@ RUNTIME START
 """
 if __name__ == '__main__':
     # Set up I2C
-    i2c = I2C(0, scl=Pin(9), sda=Pin(8)) # Raspberry Pi Pico
-
+    # Comment all but ONE of the following, depending on your board
+    #i2c = I2C(0, scl=Pin(9), sda=Pin(8)) # Raspberry Pi Pico
+    i2c = I2C(1, scl=Pin(3), sda=Pin(2)) # Feather RP2040
+    
     # Set up the RST pin
     reset = Pin(19, Pin.OUT) # Raspberry Pi Pico
 
     # Set up OLED display for a 128x64 panel
-    display = SSD1306OLED(reset, i2c, 0x3D, OLED_WIDTH, OLED_HEIGHT)
+    # Note Adafruit 128x64 OLED FeatherWing uses 0x3C as the address
+    display = SSD1306OLED(reset, i2c, 0x3C, OLED_WIDTH, OLED_HEIGHT)
     
     while True:
         # Write some random text

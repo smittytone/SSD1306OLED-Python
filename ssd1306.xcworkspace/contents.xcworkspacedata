@@ -14,7 +14,7 @@
             location = "group:eyes_128x64.py">
          </FileRef>
          <FileRef
-            location = "group:/Users/smitty/GitHub/ssd1306oled-python/examples/circuitpython/test_128x64.py">
+            location = "group:test_128x64.py">
          </FileRef>
       </Group>
       <Group

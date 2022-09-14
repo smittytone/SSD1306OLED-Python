@@ -220,7 +220,7 @@ class SSD1306OLED:
         self.i2c.writeto(self.address, bytes([0x00, self.SSD1306_NORMALDISPLAY]))
         self.i2c.writeto(self.address, bytes([0x00, self.SSD1306_DISPLAYON]))
 
-        pages = (self.height // 8) - 1  # 0x03 if self.height == 64 else 0x07
+        pages = 0x03 if self.height == 64 else 0x07 #(self.height // 8) - 1  # 
         self.i2c.writeto(self.address, bytes([0x00, self.SSD1306_COLUMNADDR, 0x00, self.width - 1]))
         self.i2c.writeto(self.address, bytes([0x00, self.SSD1306_PAGEADDR, 0x00, pages]))
 
