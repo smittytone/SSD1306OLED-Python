@@ -1,10 +1,5 @@
 """
-Runs on a Raspberry Pi Pico with MicroPython installed
-
-SSID1306 OLED board connected to:
-    SCL -> Pico GPIO 9
-    SDA -> Pico GPIO 8
-    RST -> Pico GPIO 19
+Runs on a Raspberry Pi Pico or similar with MicroPython installed
 """
 
 """
@@ -28,23 +23,23 @@ RUNTIME START
 if __name__ == '__main__':
     # Set up I2C
     # Comment all but ONE of the following, depending on your board
-    #i2c = I2C(0, scl=Pin(9), sda=Pin(8)) # Raspberry Pi Pico
-    i2c = I2C(1, scl=Pin(3), sda=Pin(2)) # Feather RP2040
-    
+    i2c = I2C(0, scl=Pin(9), sda=Pin(8)) # Raspberry Pi Pico
+    #i2c = I2C(1, scl=Pin(3), sda=Pin(2)) # Feather RP2040
+
     # Set up the RST pin
     reset = Pin(19, Pin.OUT) # Raspberry Pi Pico
 
     # Set up OLED display for a 128x64 panel
     # Note Adafruit 128x64 OLED FeatherWing uses 0x3C as the address
-    display = SSD1306OLED(reset, i2c, 0x3C, OLED_WIDTH, OLED_HEIGHT)
-    
+    display = SSD1306OLED(reset, i2c, 0x3D, OLED_WIDTH, OLED_HEIGHT)
+
     while True:
         # Write some random text
         display.clear().home().text_2x("CPU: 45%").move(0,16).text_2x("MEM: 15%")
         display.move(0,32).text_2x("DISK: 88%").move(0,48).text("NET: 1Gbps")
         display.move(0,56).text("WLAN: 802.11ac").draw()
         sleep(PAUSE * 5)
-        
+
         # Draw some patterns
         display.clear().draw()
         for i in range(0,21,4):
@@ -57,10 +52,10 @@ if __name__ == '__main__':
             display.line(i * 4, 63, 80, 0)
         display.draw()
         sleep(PAUSE * 5)
-        
+
         display.clear().draw()
         for i in range(0,21,4):
-            display.cirle(80 - i * 4, 31, 30)
+            display.cirdle(randint(127), randint(63), randint(30))
         display.draw()
         sleep(PAUSE)
 
@@ -82,7 +77,7 @@ if __name__ == '__main__':
             x += 10
             y = y - i * k
             sleep(PAUSE)
-        
+
         pixel_length = display.length_of_string("Growth")
         display.move(127 - pixel_length, 40).text("Growth").draw()
         sleep(PAUSE * 5)
