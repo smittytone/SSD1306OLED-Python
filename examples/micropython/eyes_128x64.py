@@ -83,7 +83,7 @@ if __name__ == '__main__':
     # Set up I2C
     # Comment all but ONE of the following, depending on your board
     i2c = I2C(0, scl=Pin(9), sda=Pin(8)) # Raspberry Pi Pico
-    i2c = I2C(1, scl=Pin(3), sda=Pin(2)) # Feather RP2040
+    # i2c = I2C(1, scl=Pin(3), sda=Pin(2)) # Feather RP2040
 
     # Set up the RST pin
     reset = Pin(19, Pin.OUT) # Raspberry Pi Pico

@@ -30,7 +30,6 @@ if __name__ == '__main__':
     reset = Pin(19, Pin.OUT) # Raspberry Pi Pico
 
     # Set up OLED display for a 128x64 panel
-    # Note Adafruit 128x64 OLED FeatherWing uses 0x3C as the address
     display = SSD1306OLED(reset, i2c, 0x3D, OLED_WIDTH, OLED_HEIGHT)
 
     while True:
@@ -51,13 +50,23 @@ if __name__ == '__main__':
         for i in range(0,21,4):
             display.line(i * 4, 63, 80, 0)
         display.draw()
-        sleep(PAUSE * 5)
+        sleep(PAUSE)
 
         display.clear().draw()
-        for i in range(0,21,4):
-            display.cirdle(randint(127), randint(63), randint(30))
-        display.draw()
-        sleep(PAUSE)
+        fill = True
+        for i in range(0, 11):
+            fill = True if randint(0,100) < 50 else False
+            display.circle(randint(0, OLED_WIDTH), randint(0, OLED_HEIGHT), randint(4, OLED_HEIGHT // 2 - 1), 1, fill).draw()
+            fill = not fill
+            sleep(PAUSE / 2)
+
+        display.clear().draw()
+        fill = True
+        for i in range(0, 11):
+            display.rect(randint(0, OLED_WIDTH), randint(0, OLED_HEIGHT), randint(0, OLED_HEIGHT), randint(0, OLED_HEIGHT // 2), 1, fill).draw()
+            fill = not fill
+            sleep(PAUSE / 2)
+        sleep(PAUSE * 5)
 
         # Draw a chart
         display.clear().draw()

@@ -1,10 +1,5 @@
 """
-Runs on a Raspberry Pi Pico with MicroPython installed
-
-SSID1306 OLED board connected to:
-    SCL -> Pico GPIO 9
-    SDA -> Pico GPIO 8
-    RST -> Pico GPIO 19
+Runs on a Raspberry Pi Pico or similar with MicroPython installed
 """
 
 """

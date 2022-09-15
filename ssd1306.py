@@ -11,7 +11,7 @@ class SSD1306OLED:
     """
 
     # *********** CONSTANTS **********
-    
+
     SSD1306_MEMORYMODE = 0x20
     SSD1306_COLUMNADDR = 0x21
     SSD1306_PAGEADDR = 0x22
@@ -269,7 +269,7 @@ class SSD1306OLED:
 
     def plot(self, x, y, colour=1):
         """
-        Plot a point (or clear) the pixel at the specified co-ordnates
+        Plot a point (or clear) the pixel at the specified co-ordinates
 
         Args:
             x      (int) The X co-ordinate in the range 0 - 127
@@ -280,7 +280,8 @@ class SSD1306OLED:
             The instance (self)
         """
         # Bail if any co-ordinates are off the screen
-        assert (0 <= x < self.width) and (0 <= y < self.height), "ERROR - Out-of-range co-ordinate(s) passed to plot()"
+        if x < 0 or x > self.width - 1 or y < 0 or y > self.height - 1:
+            return self
         if colour not in (0, 1): colour = 1
         byte = self._coords_to_index(x, y)
         bit = y - ((y >> 3) << 3)
@@ -350,7 +351,7 @@ class SSD1306OLED:
 
     def circle(self, x, y, radius, colour=1, fill=False):
         """
-        Draw a circle at the specified co-ordnates
+        Draw a circle at the specified co-ordinates
 
         Args:
             x (int)      The centre X co-ordinate in the range 0 - 127
@@ -365,19 +366,19 @@ class SSD1306OLED:
         for i in range(180):
             a = x - int(radius * self.SIN_TABLE[i])
             b = y - int(radius * self.COS_TABLE[i])
-            if 0 <= a < self.width and 0 <= b < self.height:
-                self.plot(a, b, colour)
-                if fill:
-                    if a > x:
-                        j = x
-                        while j < a:
-                            self.plot(j, b, colour)
-                            j += 1
-                    else:
-                        j = a + 1
-                        while j <= x:
-                            self.plot(j, b, colour)
-                            j += 1
+            # plot() handles off-screen plotting
+            self.plot(a, b, colour)
+            if fill:
+                if a > x:
+                    j = x
+                    while j < a and j < self.width:
+                        self.plot(j, b, colour)
+                        j += 1
+                else:
+                    j = a + 1
+                    while j <= x:
+                        self.plot(j, b, colour)
+                        j += 1
         return self
 
     def rect(self, x, y, width, height, colour=1, fill=False):
