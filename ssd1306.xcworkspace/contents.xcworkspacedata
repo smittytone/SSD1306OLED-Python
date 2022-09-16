@@ -14,6 +14,9 @@
             location = "group:eyes_128x64.py">
          </FileRef>
          <FileRef
+            location = "group:test_128x32.py">
+         </FileRef>
+         <FileRef
             location = "group:test_128x64.py">
          </FileRef>
       </Group>
@@ -25,6 +28,9 @@
          </FileRef>
          <FileRef
             location = "group:eyes_128x64.py">
+         </FileRef>
+         <FileRef
+            location = "group:test_128x32.py">
          </FileRef>
          <FileRef
             location = "group:test_128x64.py">

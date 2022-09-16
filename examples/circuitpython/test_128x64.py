@@ -32,7 +32,7 @@ if __name__ == '__main__':
     reset = digitalio.DigitalInOut(board.GP19)
     reset.direction = digitalio.Direction.OUTPUT
 
-    # Set up OLED display
+    # Set up OLED display for a 128x64 panel
     display = SSD1306OLED(reset, i2c, 0x3D, OLED_WIDTH, OLED_HEIGHT)
 
     while True:
@@ -42,16 +42,35 @@ if __name__ == '__main__':
         display.move(0,56).text("WLAN: 802.11ac").draw()
         sleep(PAUSE * 5)
 
-        # Draw some patterns
+        # Draw some patterns:
+        # Lines
         display.clear().draw()
-        for i in range(0,21,4):
-            display.line(0, 0, 80 - i * 4, 63)
+        for i in range(0, 31, 4):
+            display.line(0, 0, 120 - i * 4, OLED_HEIGHT - 1)
         display.draw()
         sleep(PAUSE)
 
-        for i in range(0,21,4):
-            display.line(i * 4, 63, 80, 0)
+        display.clear().draw()
+        for i in range(0, 31, 4):
+            display.line(i * 4, OLED_HEIGHT - 1, 120, 0)
         display.draw()
+        sleep(PAUSE)
+
+        # Circles
+        display.clear().draw()
+        fill = True
+        for i in range(0, 11):
+            display.circle(randint(0, OLED_WIDTH), randint(0, OLED_HEIGHT), randint(4, OLED_HEIGHT // 2 - 1), 1, fill).draw()
+            fill = not fill
+            sleep(PAUSE / 2)
+        
+        # Rectangles
+        display.clear().draw()
+        fill = True
+        for i in range(0, 11):
+            display.rect(randint(0, OLED_WIDTH), randint(0, OLED_HEIGHT), randint(0, OLED_HEIGHT), randint(0, OLED_HEIGHT // 2), 1, fill).draw()
+            fill = not fill
+            sleep(PAUSE / 2)
         sleep(PAUSE * 5)
 
         # Draw a chart
