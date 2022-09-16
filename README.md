@@ -23,7 +23,7 @@ You can find full details of the driver’s methods [at my documentation site](h
 
 ## Release Notes ##
 
-- 2.0.0 *Unreleased*
+- 2.0.0 *16 September 2022*
     - Combine MicroPython and CircuitPython versions into a single class.
     - Update examples.
 - 1.0.0 *25 August 2020*
