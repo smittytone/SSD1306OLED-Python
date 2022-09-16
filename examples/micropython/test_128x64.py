@@ -88,5 +88,5 @@ if __name__ == '__main__':
             sleep(PAUSE)
 
         pixel_length = display.length_of_string("Growth")
-        display.move(127 - pixel_length, OLED_HEIGHT - 24).text("Growth").draw()
+        display.move(127 - pixel_length, int(OLED_HEIGHT * 0.75) - 8).text("Growth").draw()
         sleep(PAUSE * 5)
